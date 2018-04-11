@@ -17,7 +17,9 @@
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
     "polymerfire": "firebase/polymerfire#^2.2.1",
     "iron-meta": "PolymerElements/iron-meta#^2.1.0",
-    "paper-toast": "PolymerElements/paper-toast#^2.1.0"
+    "paper-toast": "PolymerElements/paper-toast#^2.1.0",
+    "vaadin-valo-theme": "vaadin/vaadin-valo-styles#^0.3.2",
+    "vaadin-combo-box": "vaadin/vaadin-combo-box#^3.0.5"
   },
   "resolutions": {
     "polymer": "^2.0.0"
