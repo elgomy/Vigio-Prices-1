@@ -1,0 +1,23 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+    
+<script>
+
+	/**
+	* Mixin to clear any type of inputs in a form
+	* @param {inputType}, example 'paper-input' or 'vaadin-combo-box' 
+	**/
+
+	ClearFormInputs = Polymer.dedupingMixin(function(superClass){
+		return class extends superClass{
+      		clearInputs(inputType){
+        		var inputs = this.shadowRoot.querySelectorAll(inputType);
+        		for(var i = 0; i < inputs.length; i++){
+          			inputs[i].value = ''
+        		}
+
+      		}
+		}
+	});
+
+
+</script>
