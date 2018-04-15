@@ -1,0 +1,74 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/vaadin-text-field/vaadin-text-field.html">
+<link rel="import" href="../bower_components/vaadin-valo-theme/vaadin-text-field.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../mixins/clear-form-inputs.html">
+<link rel="import" href="../mixins/toast-mixin.html">
+    
+<dom-module id="product-form">
+  <!-- Optional shadow DOM template -->
+  <template>
+    <style>
+      
+    	vaadin-text-field{
+        	width: 15rem;
+     	}
+
+    </style>
+
+    <div>
+    	<vaadin-text-field 
+    		label="Cadastra o produto" 
+    		id="product" 
+    		placeholder="Produto">
+    	</vaadin-text-field>
+    </div>
+
+    <paper-button raised on-click="addProduct">OK</paper-button>
+
+  </template>
+
+  <script>
+
+    // Define the element's API using an ES2015 class
+    class ProductForm extends ClearFormInputs(ToastMixin(Polymer.Element)) {
+
+      static get is() { return 'product-form'; }
+
+      // Declare properties for the element's public API         
+      static get properties() {
+        return {
+          product: {
+            type: Object,
+           
+          },
+
+        }
+      }
+
+      addProduct(){
+      	this.product = {
+              name: this.$.product.value
+        };
+
+        if(this.$.product.value){
+        	this.dispatchEvent(new CustomEvent('save-product', {bubbles:true, composed:true, detail:this.product}));
+
+        	this.clearInputs('vaadin-text-field')
+        }
+        else {
+          this.$.product.invalid = true;
+        	this.$.product.errorMessage = "digita o nome do produto";
+        	console.log('error')
+        	}
+        
+      }
+     
+
+    }
+
+    // Register the x-custom element with the browser
+    customElements.define(ProductForm.is, ProductForm);
+  </script>
+
+</dom-module>

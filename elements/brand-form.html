@@ -1,0 +1,73 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/vaadin-text-field/vaadin-text-field.html">
+<link rel="import" href="../bower_components/vaadin-valo-theme/vaadin-text-field.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../mixins/clear-form-inputs.html">
+<link rel="import" href="../mixins/toast-mixin.html">
+    
+<dom-module id="brand-form">
+  <!-- Optional shadow DOM template -->
+  <template>
+    <style>
+      
+    	vaadin-text-field{
+        	width: 15rem;
+     	}
+
+    </style>
+
+    <div>
+    	<vaadin-text-field 
+    		label="Cadastra a marca" 
+    		id="brand" 
+    		placeholder="Marca">
+    	</vaadin-text-field>
+    </div>
+
+    <paper-button raised on-click="addBrand">OK</paper-button>
+
+  </template>
+
+  <script>
+
+    // Define the element's API using an ES2015 class
+    class BrandForm extends ClearFormInputs(ToastMixin(Polymer.Element)) {
+
+      static get is() { return 'brand-form'; }
+
+      // Declare properties for the element's public API         
+      static get properties() {
+        return {
+          brand: {
+            type: Object,
+           
+          },
+
+        }
+      }
+
+      addBrand(){
+      	this.brand = {
+              name: this.$.brand.value
+        };
+
+        if(this.$.brand.value){
+        	this.dispatchEvent(new CustomEvent('save-brand', {bubbles:true, composed:true, detail:this.brand}));
+
+        	this.clearInputs('vaadin-text-field')
+        }
+        else {
+          this.$.brand.invalid = true;
+        	this.$.brand.errorMessage = "digita o nome da marca";
+        	}
+        
+      }
+     
+
+    }
+
+    // Register the x-custom element with the browser
+    customElements.define(BrandForm.is, BrandForm);
+  </script>
+
+</dom-module>

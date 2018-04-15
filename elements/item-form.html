@@ -72,7 +72,7 @@
 
     <div class="text-container">
         <span>Não acha o produto?</span>
-        <iron-icon icon="my-icons:note-add" on-tap="openProdDialog"></iron-icon>
+        <iron-icon icon="my-icons:note-add" on-click="openDialog"></iron-icon>
     </div>
 
     <div class="combo-container">
@@ -89,7 +89,7 @@
 
     <div class="text-container">
         <span>Não acha o marca?</span>
-        <iron-icon icon="my-icons:note-add" on-tap="openBrandDialog"></iron-icon>
+        <iron-icon icon="my-icons:note-add" on-click="openBrandDialog"></iron-icon>
     </div>
 
 	<!-- INPUT FIELD -->
@@ -223,6 +223,14 @@
           this.$.comboProducts.disabled = true;
           this.$.comboBrands.disabled = true;
           this.$.priceField.disabled = true;
+      }
+
+      openDialog(){
+          this.dispatchEvent(new CustomEvent('open-dialog', {bubbles:true, composed:true}))
+      }
+
+      openBrandDialog(){
+          this.dispatchEvent(new CustomEvent('open-dialog-brand', {bubbles:true, composed:true}))
       }
 
     }
