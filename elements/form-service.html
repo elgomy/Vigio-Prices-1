@@ -66,6 +66,7 @@
         this.fbapp = this.fireService.fbapp;
       }
 
+      /** save a new item in the Firebase Firestore */
       saveItem(e){
         this.item = e.detail;
         let db = this.fbapp.firestore();
@@ -84,7 +85,7 @@
       openDialog(){
         this.$.dialogProduct.opened = true;
       }
-
+      /** save a new product in the Firebase Firestore */
       addProduct(e){
         this.product = e.detail;
         let db = this.fbapp.firestore();
@@ -102,7 +103,7 @@
       openDialogBrand(){
         this.$.dialogBrand.opened = true;
       }
-
+      /** save a new brand in the Firebase Firestore */
       addBrand(e){
         this.brand = e.detail;
         let db = this.fbapp.firestore();

@@ -224,11 +224,11 @@
           this.$.comboBrands.disabled = true;
           this.$.priceField.disabled = true;
       }
-
+      /** open product dialog to add a new product type */
       openDialog(){
           this.dispatchEvent(new CustomEvent('open-dialog', {bubbles:true, composed:true}))
       }
-
+      /** open brand dialog to add a new brand */
       openBrandDialog(){
           this.dispatchEvent(new CustomEvent('open-dialog-brand', {bubbles:true, composed:true}))
       }
