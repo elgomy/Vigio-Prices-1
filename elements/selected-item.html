@@ -1,0 +1,75 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/neon-animation/web-animations.html">
+<link rel="import" href="../bower_components/vaadin-lumo-styles/color.html">
+<link rel="import" href="../bower_components/vaadin-lumo-styles/style.html">
+
+<link rel="import" href="../src/my-icons.html">
+    
+<dom-module id="selected-item">
+  <!-- Optional shadow DOM template -->
+  <template>
+    <style>
+    
+      paper-icon-item{
+        border:1px solid var(--lumo-primary-color);
+        border-radius: var(--lumo-border-radius);
+        box-shadow: var(--lumo-box-shadow-s);
+       
+      }
+  
+    </style>
+
+    <!-- shadow DOM for your element -->
+
+    <paper-icon-item>
+    	<paper-item-body>
+    		<div>[[item]]</div>
+    	</paper-item-body>
+      <paper-menu-button vertical-align="bottom" horizontal-align="right" horizontal-offset="5" vertical-offset="-12">
+        <paper-icon-button icon="my-icons:more-vert" slot="dropdown-trigger"></paper-icon-button>
+          <paper-listbox slot="dropdown-content">
+            <paper-item>Painel</paper-item>
+            <paper-item>Editar</paper-item>
+            <paper-item>Deletar</paper-item>
+          </paper-listbox>
+      </paper-menu-button>
+      <iron-icon icon="my-icons:cancel" on-click="cancel"></iron-icon>
+    </paper-icon-item>
+
+   
+
+  </template>
+
+  <script>
+
+    // Define the element's API using an ES2015 class
+    class SelectedItem extends Polymer.Element {
+
+      static get is() { return 'selected-item'; }
+
+      // Declare properties for the element's public API         
+      static get properties() {
+        return {
+          item:String,
+        }
+      }
+
+      cancel(){
+      	this.dispatchEvent(new CustomEvent('clear-selected',{bubbles:true, composed:true}))
+      }
+    
+
+    }
+
+    // Register the x-custom element with the browser
+    customElements.define(SelectedItem.is, SelectedItem);
+  </script>
+
+</dom-module>

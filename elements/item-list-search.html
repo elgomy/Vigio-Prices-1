@@ -1,0 +1,142 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<!-- VAADIN COMBO BOX -->
+<link rel="import" href="../bower_components/vaadin-valo-theme/vaadin-combo-box.html">
+<link rel="import" href="../bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<!-- VAADIN LIST BOX -->
+<link rel="import" href="../bower_components/vaadin-valo-theme/vaadin-combo-box.html">
+<link rel="import" href="../bower_components/vaadin-list-box/vaadin-list-box.html">
+<link rel="import" href="../bower_components/vaadin-item/vaadin-item.html">
+<!-- FIREBASE SERVICE META -->
+<link rel="import" href="../bower_components/iron-meta/iron-meta.html">
+<!-- MIXINS -->
+<link rel="import" href="../mixins/add-firecollection-combobox.html">
+
+<link rel="import" href="selected-item.html">
+
+<dom-module id="item-list-search">
+  <!-- Optional shadow DOM template -->
+  <template>
+    <style>
+      
+      vaadin-combo-box{
+        width: 15rem;  
+      }
+
+    </style>
+
+    <iron-meta id="elmeta"></iron-meta>
+
+    <div class="combo-container">
+     	<vaadin-combo-box 
+     		id="comboProducts" 
+     		label="Produto" 
+     		placeholder="Seleciona" 
+     		items="[[products]]"  
+     		on-selected-item-changed="selectItem" 
+     		error-message="seleciona um producto">         
+      	</vaadin-combo-box>
+    </div>
+
+    <!-- SELECTED ITEM -->
+    <template is="dom-if" if="[[selectedProd]]">
+      <selected-item item="[[selectedProd]]" on-clear-selected="clearSelected"></selected-item>
+    </template>
+
+
+ 
+    <!--
+    <template is="dom-if" if="[[!selectedProd]]">
+      <iron-list id="list" items="[[products]]" as="product" on-selected-item-changed="test" selected-item="{{select}}">
+        <template>
+          <div>
+            <paper-item>[[product]]</paper-item>
+          </div>
+        </template>
+      </iron-list>
+    </template> -->
+    
+    <!-- ITEM LIST -->
+    <template is="dom-if" if="[[!selectedProd]]">
+      <vaadin-list-box selected="{{selectedVaadinList}}">
+        <template is="dom-repeat" items="[[products]]" as="product">
+          <vaadin-item>[[product]]</vaadin-item>
+        </template>
+      </vaadin-list-box>
+    </template>
+
+  </template>
+
+  <script>
+
+    // Define the element's API using an ES2015 class
+    class ItemListSearch extends AddFirecollectionCombobox(Polymer.Element) {
+
+      static get is() { return 'item-list-search'; }
+
+      // Declare properties for the element's public API         
+      static get properties() {
+        return {
+        	/** Receive the firebase-service from iron-meta to access all the Firebase services .*/
+          fireService:Object,
+
+          /** Object that contents fbapp object included in the fbapp property of firebaService Object .*/
+          fbapp:Object,
+
+          /** Products Array where store product names receceived by Firebase Firestore (add-firecollection-combobox Mixin) .*/
+          products:{
+            type:Array,
+            value(){
+              return[]
+            }
+          },
+
+          /** Selected product using vaadin-combo-box or vaadin-list-box */
+          selectedProd:String,
+
+          /** Array index of selected product using vaadin-list-box which value is used to set 'selectedProd' property through an observer, as vaadin-list-box doesn't offer an event when an item is selected in the list  */
+          selectedVaadinList:{
+            type:Number,
+            observer:'selectedListChange'
+          }
+        }
+      }
+
+      ready(){
+      	super.ready();
+
+      	this.set('products',[]); // clean Array in order not to duplicate
+
+      	/** firebase service Objects */
+      	this.fireService = this.$.elmeta.byKey('shareService');
+      	this.fbapp = this.fireService.fbapp;
+		    let db = this.fbapp.firestore();
+
+		    /** add-firecollection-combobox Mixin */
+      	this.addList('products','products',db); 
+        this.selectedProd = this.$.comboProducts.value
+      }
+      /** Fired when a vaadin-combo-box selected item is changed an assign his value to 'selectedProd' property */
+      selectItem(){
+        this.selectedProd = this.$.comboProducts.value
+      }
+      /** Observer that makes an event funtionality, as vaadin-list-box does't offer an event when selected item changed. selectedVaadinList is the Array item index returned by vaadin-list-box */
+      selectedListChange(){
+        this.selectedProd = this.products[this.selectedVaadinList]
+      }
+      /** Clear selected item when selected-item cancel button is clicked */
+      clearSelected(){
+        this.selectedProd = '';
+        this.selectedVaadinList = '';
+        this.$.comboProducts.value = '';
+      }
+     
+
+    }
+
+    // Register the x-custom element with the browser
+    customElements.define(ItemListSearch.is, ItemListSearch);
+  </script>
+
+</dom-module>
