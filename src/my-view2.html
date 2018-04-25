@@ -11,6 +11,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="../elements/item-list-search.html">
+<link rel="import" href="../elements/item-supermarket.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+<link rel="import" href="../mixins/firebase-service-firestore.html">
+<link rel="import" href="../mixins/add-firecollection-array.html">
+<!-- FIREBASE SERVICE META -->
+<link rel="import" href="../bower_components/iron-meta/iron-meta.html">
 
 <dom-module id="my-view2">
   <template>
@@ -22,14 +29,52 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
 
+    <iron-meta id="elmeta"></iron-meta>
+
+    <app-route
+        route="{{route}}"
+        pattern="/:product"
+        data="{{data}}">
+    </app-route>
+
     <div class="card">
+     
+     <!-- PRODUCT SEARCH & LIST ELEMENTS -->    
       <item-list-search></item-list-search>
+
+      <!-- SUPERMARKETS & SUPERMARKET PRODUCTS ELEMENTS --> 
+      <template is="dom-if" if="[[data.product]]">
+        <template is="dom-repeat" items="[[supermarkets]]" as="supermarket">
+          <item-supermarket 
+            item="[[data.product]]" 
+            supermarket="[[supermarket]]">
+          </item-supermarket>
+        </template>
+      </template>
+
     </div>
   </template>
 
   <script>
-    class MyView2 extends Polymer.Element {
+    class MyView2 extends FirebaseServiceFirestore(AddFirecollectionArray(Polymer.Element)) {
       static get is() { return 'my-view2'; }
+
+      static get properties() {
+        return{
+          supermarkets:{
+            type:Array,
+            value(){
+              return[]
+            }
+          },
+        }
+      }
+
+      ready(){
+        super.ready();
+        let db = this.initializeFireservice();
+        this.addList('supermarkets','supermarkets', db);
+      }
     }
 
     window.customElements.define(MyView2.is, MyView2);

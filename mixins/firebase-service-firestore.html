@@ -1,0 +1,20 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+    
+<script>
+
+	/**
+	* Mixin to be combined with firebase-service element which returns 'fbapp' object that is used by this mixin to return the firestore database
+	**/
+
+	FirebaseServiceFirestore = Polymer.dedupingMixin(function(superClass){
+		return class extends superClass{
+			initializeFireservice(){
+		        let fireService = this.$.elmeta.byKey('shareService');
+		        let fbapp = fireService.fbapp;
+		        var database = fbapp.firestore();     
+		        return database
+      		}
+		}
+	});
+
+</script>

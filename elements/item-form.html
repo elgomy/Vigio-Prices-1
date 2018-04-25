@@ -8,7 +8,7 @@
 
 <!-- VAADIN LUMO STYLES -->
 <link rel="import" href="../bower_components/vaadin-lumo-styles/typography.html">
-
+<link rel="import" href="../bower_components/vaadin-lumo-styles/color.html">
 <!-- FIREBASE SERVICE META -->
 <link rel="import" href="../bower_components/iron-meta/iron-meta.html">
 
@@ -16,15 +16,18 @@
 <link rel="import" href="../mixins/add-firecollection-combobox.html">
 <link rel="import" href="../mixins/toast-mixin.html">
 <link rel="import" href="../mixins/clear-form-inputs.html">
+<link rel="import" href="../mixins/firebase-service-firestore.html">
 
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../src/my-icons.html">
 
     
 <dom-module id="item-form">
   <!-- Optional shadow DOM template -->
   <template>
-    <style include="lumo-typography">
+    <style include="lumo-typography lumo-color">
       
     	vaadin-combo-box, vaadin-text-field{
       		width: 15rem;  
@@ -35,9 +38,15 @@
           --iron-icon-height:18px; 
       }
 
-      .text-container{
+      .text-container, .radio-button{
           font-family: var(--lumo-font-family);
           font-size: var(--lumo-font-size-xs);
+      }
+
+      paper-radio-button{
+        --paper-radio-button-label-color: var(--lumo-secondary-text-color);
+        --paper-radio-button-checked-color: var(--lumo-primary-color);
+        --paper-radio-button-unchecked-color: var(--lumo-primary-color);
       }
 
     </style>
@@ -50,11 +59,16 @@
       		id="comboMarkets" 
       		label="Supermercado" 
       		placeholder="Seleciona" 
-      		items="[[supermarket]]" 
+      		items="[[supermarkets]]" 
       		on-selected-item-changed="enableComboProd" 
       		required 
       		error-message="seleciona um supermercado">
       	</vaadin-combo-box>
+    </div>
+
+    <div class="text-container">
+        <span>Não acha o supermercado?</span>
+        <iron-icon icon="my-icons:note-add" on-click="openMarketDialog"></iron-icon>
     </div>
 
     <div class="combo-container">
@@ -105,6 +119,10 @@
     	</vaadin-text-field>
     </div>
 
+    <paper-radio-group id="radioGroup" selected="normal">
+      <paper-radio-button name="normal" value="normal" class="radio-button">Sem Oferta</paper-radio-button>
+      <paper-radio-button name="discount" value="discount" class="radio-button">Oferta</paper-radio-button>
+    </paper-radio-group>
 
     <div>
       <paper-button raised on-click="addItem">OK</paper-button>
@@ -115,26 +133,13 @@
   <script>
 
     // Define the element's API using an ES2015 class
-    class ItemForm extends AddFirecollectionCombobox(ToastMixin(ClearFormInputs(Polymer.Element))) {
+    class ItemForm extends AddFirecollectionCombobox(ToastMixin(ClearFormInputs(FirebaseServiceFirestore(Polymer.Element)))) {
 
       static get is() { return 'item-form'; }
 
       // Declare properties for the element's public API         
       static get properties() {
         return {
-
-          supermarket:{
-            type:Array,
-            value(){
-              return ['carrefour','dia','epa','supernosso','verdemar']
-            }
-          },
-
-          /** Receive the firebase-service from iron-meta to access all the Firebase services .*/
-          fireService:Object,
-
-          /** Object that contents fbapp object included in the fbapp property of firebaService Object .*/
-          fbapp:Object,
 
           /** Products Array where store product names receceived by Firebase Firestore (add-firecollection-combobox Mixin) .*/
           products:{
@@ -151,6 +156,14 @@
             }
           },
 
+            /** Supermarket Array where store supermarkets receceived by Firebase Firestore (add-firecollection-combobox Mixin)  .*/
+          supermarkets:{
+            type:Array,
+            value(){
+              return[]
+            }
+          },
+
           item:{
             type:Object,
             value(){
@@ -159,7 +172,8 @@
                 brand:'',
                 price:'',
                 supermarket:'',
-                date:''
+                date:'',
+                priceType:''
               }
             }
           },
@@ -171,14 +185,12 @@
 
       	this.set('products',[]); // clean Array in order not to duplicate
 
-      	/** firebase service Objects */
-      	this.fireService = this.$.elmeta.byKey('shareService');
-      	this.fbapp = this.fireService.fbapp;
-		    let db = this.fbapp.firestore();
+      	let db = this.initializeFireservice();
 
 		    /** add-firecollection-combobox Mixin */
       	this.addList('products','products',db); 
       	this.addList('brands','brands',db); 
+        this.addList('supermarkets','supermarkets',db);
       }
 
       /** enable comboProducts vaadin-combo-box when supermarket is selected in comboMarkets vaadin-combo-box. */
@@ -204,6 +216,7 @@
               brand: this.$.comboBrands.value,
               price: parseFloat(this.$.priceField.value),
               supermarket: this.$.comboMarkets.value,
+              priceType: this.$.radioGroup.selected,
               date: new Date(),
               formattedDate: new Date(Date.now()).toLocaleString().split(' ')[0],
               Id:'',
@@ -231,6 +244,11 @@
       /** open brand dialog to add a new brand */
       openBrandDialog(){
           this.dispatchEvent(new CustomEvent('open-dialog-brand', {bubbles:true, composed:true}))
+      }
+
+      /** open supermarket dialog to add a new supermarket */
+      openMarketDialog(){
+          this.dispatchEvent(new CustomEvent('open-dialog-supermarket', {bubbles:true, composed:true}))
       }
 
     }

@@ -1,0 +1,78 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/neon-animation/web-animations.html">
+
+
+<link rel="import" href="../src/my-icons.html">
+    
+<dom-module id="item-w-actions">
+
+  <template>
+    <style>
+     
+  
+    </style>
+
+
+    <paper-icon-item>
+    	<paper-item-body two-line>
+    		<div>[[name]]</div>
+        <div secondary>
+          <div>preço: [[price]]</div>
+          <div>marca: [[brand]]</div>
+        </div>
+    	</paper-item-body>
+      <paper-menu-button 
+        vertical-align="bottom" 
+        horizontal-align="right" 
+        horizontal-offset="5" 
+        vertical-offset="-12">
+          <paper-icon-button 
+            icon="my-icons:more-vert" 
+            slot="dropdown-trigger">
+          </paper-icon-button>
+            <paper-listbox slot="dropdown-content">
+              <paper-item on-click="setItemRoute">Painel</paper-item>
+              <paper-item>Editar</paper-item>
+              <paper-item on-click="deleteItem">Deletar</paper-item>
+            </paper-listbox>
+      </paper-menu-button>
+      <iron-icon icon="my-icons:cancel" on-click="cancel"></iron-icon>
+    </paper-icon-item>  
+
+  </template>
+
+  <script>
+
+     /**
+      * Paper-icon-item with actions menu
+      **/
+    class ItemWActions extends Polymer.Element {
+
+      static get is() { return 'item-w-actions'; }
+        
+      static get properties() {
+        return {
+          name:String,
+          brand:String,
+          price:Number,
+        }
+      }
+
+      cancel(){
+      	this.dispatchEvent(new CustomEvent('clear-selected',{bubbles:true, composed:true}))
+      }  
+
+    }
+
+    // Register the x-custom element with the browser
+    customElements.define(ItemWActions.is, ItemWActions);
+  </script>
+
+</dom-module>

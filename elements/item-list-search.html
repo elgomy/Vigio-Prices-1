@@ -12,6 +12,8 @@
 <link rel="import" href="../bower_components/iron-meta/iron-meta.html">
 <!-- MIXINS -->
 <link rel="import" href="../mixins/add-firecollection-combobox.html">
+<link rel="import" href="../mixins/navigate-mixin.html">
+<link rel="import" href="../mixins/firebase-service-firestore.html">
 
 <link rel="import" href="selected-item.html">
 
@@ -36,26 +38,13 @@
      		items="[[products]]"  
      		on-selected-item-changed="selectItem" 
      		error-message="seleciona um producto">         
-      	</vaadin-combo-box>
+      </vaadin-combo-box>
     </div>
 
     <!-- SELECTED ITEM -->
     <template is="dom-if" if="[[selectedProd]]">
       <selected-item item="[[selectedProd]]" on-clear-selected="clearSelected"></selected-item>
     </template>
-
-
- 
-    <!--
-    <template is="dom-if" if="[[!selectedProd]]">
-      <iron-list id="list" items="[[products]]" as="product" on-selected-item-changed="test" selected-item="{{select}}">
-        <template>
-          <div>
-            <paper-item>[[product]]</paper-item>
-          </div>
-        </template>
-      </iron-list>
-    </template> -->
     
     <!-- ITEM LIST -->
     <template is="dom-if" if="[[!selectedProd]]">
@@ -70,19 +59,18 @@
 
   <script>
 
-    // Define the element's API using an ES2015 class
-    class ItemListSearch extends AddFirecollectionCombobox(Polymer.Element) {
+     /**
+      * Element to show a list of the products and select one
+      * The selection can be done using a vaadin-combo-box (search) or a vaadin-list-box (products list)
+      * The selected product is shown in the selected-item component
+      **/
+    class ItemListSearch extends AddFirecollectionCombobox(NavigateMixin(FirebaseServiceFirestore(Polymer.Element))) {
 
       static get is() { return 'item-list-search'; }
 
       // Declare properties for the element's public API         
       static get properties() {
         return {
-        	/** Receive the firebase-service from iron-meta to access all the Firebase services .*/
-          fireService:Object,
-
-          /** Object that contents fbapp object included in the fbapp property of firebaService Object .*/
-          fbapp:Object,
 
           /** Products Array where store product names receceived by Firebase Firestore (add-firecollection-combobox Mixin) .*/
           products:{
@@ -99,37 +87,42 @@
           selectedVaadinList:{
             type:Number,
             observer:'selectedListChange'
-          }
+          },
         }
       }
 
       ready(){
       	super.ready();
-
-      	this.set('products',[]); // clean Array in order not to duplicate
-
-      	/** firebase service Objects */
-      	this.fireService = this.$.elmeta.byKey('shareService');
-      	this.fbapp = this.fireService.fbapp;
-		    let db = this.fbapp.firestore();
-
-		    /** add-firecollection-combobox Mixin */
-      	this.addList('products','products',db); 
+      	let db = this.initializeFireservice(); /** firebase-service-firestore Mixin */	    
+      	this.addList('products','products',db); /** add-firecollection-combobox Mixin */
         this.selectedProd = this.$.comboProducts.value
       }
+
       /** Fired when a vaadin-combo-box selected item is changed an assign his value to 'selectedProd' property */
       selectItem(){
-        this.selectedProd = this.$.comboProducts.value
+        this.selectedProd = this.$.comboProducts.value;
+        this.setItemRoute();
       }
+
       /** Observer that makes an event funtionality, as vaadin-list-box does't offer an event when selected item changed. selectedVaadinList is the Array item index returned by vaadin-list-box */
       selectedListChange(){
-        this.selectedProd = this.products[this.selectedVaadinList]
+        this.selectedProd = this.products[this.selectedVaadinList];
+        this.setItemRoute();
       }
-      /** Clear selected item when selected-item cancel button is clicked */
+      /** 
+      * Clear selected item when selected-item cancel button is clicked 
+      */
       clearSelected(){
         this.selectedProd = '';
         this.selectedVaadinList = '';
         this.$.comboProducts.value = '';
+        this.navigateTo('');
+      }
+      /** 
+      * Create a route adding the selected product as parameter
+      */
+      setItemRoute(){      
+        this.navigateTo(this.selectedProd); // navigate-mixin
       }
      
 

@@ -30,19 +30,17 @@
 
   <script>
 
-    // Define the element's API using an ES2015 class
+    /**
+      * Small form to add a new product in the Firebase Firestore
+      * Linked with form-service element
+      **/
     class ProductForm extends ClearFormInputs(ToastMixin(Polymer.Element)) {
 
       static get is() { return 'product-form'; }
-
-      // Declare properties for the element's public API         
+        
       static get properties() {
         return {
-          product: {
-            type: Object,
-           
-          },
-
+          product:Object,     
         }
       }
 
@@ -59,10 +57,8 @@
         else {
           this.$.product.invalid = true;
         	this.$.product.errorMessage = "digita o nome do produto";
-        	}
-        
-      }
-     
+        }    
+      }     
 
     }
 

@@ -4,9 +4,9 @@
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../mixins/clear-form-inputs.html">
 <link rel="import" href="../mixins/toast-mixin.html">
-
-<dom-module id="brand-form">
-
+    
+<dom-module id="supermarket-form">
+  <!-- Optional shadow DOM template -->
   <template>
     <style>
       
@@ -18,47 +18,47 @@
 
     <div>
     	<vaadin-text-field 
-    		label="Cadastra a marca" 
-    		id="brand" 
-    		placeholder="Marca">
+    		label="Cadastra o supermercado" 
+    		id="supermarket" 
+    		placeholder="Supermercado">
     	</vaadin-text-field>
     </div>
 
-    <paper-button raised on-click="addBrand">OK</paper-button>
+    <paper-button raised on-click="addSupermarket">OK</paper-button>
 
   </template>
 
   <script>
+
     /**
-      * Small form to add a new brand in the Firebase Firestore
+      * Small form to add a new supermarket in the Firebase Firestore
       * Linked with form-service element
       **/
+    class SupermarketForm extends ClearFormInputs(ToastMixin(Polymer.Element)) {
 
-    class BrandForm extends ClearFormInputs(ToastMixin(Polymer.Element)) {
-
-      static get is() { return 'brand-form'; }
-        
+      static get is() { return 'supermarket-form'; }
+       
       static get properties() {
         return {
-          brand: {
-            type: Object,        
+          supermarket: {
+            type: Object,      
           },
         }
       }
 
-      addBrand(){
-      	this.brand = {
-              name: this.$.brand.value
+      addSupermarket(){
+      	this.supermarket = {
+              name: this.$.supermarket.value
         };
 
-        if(this.$.brand.value){
-        	this.dispatchEvent(new CustomEvent('save-brand', {bubbles:true, composed:true, detail:this.brand}));
+        if(this.$.supermarket.value){
+        	this.dispatchEvent(new CustomEvent('save-supermarket', {bubbles:true, composed:true, detail:this.supermarket}));
 
         	this.clearInputs('vaadin-text-field')
         }
         else {
-          this.$.brand.invalid = true;
-        	this.$.brand.errorMessage = "digita o nome da marca";
+          this.$.supermarket.invalid = true;
+        	this.$.supermarket.errorMessage = "digita o nome do supermercado";
         }
         
       }
@@ -67,7 +67,7 @@
     }
 
     // Register the x-custom element with the browser
-    customElements.define(BrandForm.is, BrandForm);
+    customElements.define(SupermarketForm.is, SupermarketForm);
   </script>
 
 </dom-module>

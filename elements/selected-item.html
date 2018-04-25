@@ -10,6 +10,8 @@
 <link rel="import" href="../bower_components/vaadin-lumo-styles/color.html">
 <link rel="import" href="../bower_components/vaadin-lumo-styles/style.html">
 
+<link rel="import" href="../mixins/navigate-mixin.html">
+
 <link rel="import" href="../src/my-icons.html">
     
 <dom-module id="selected-item">
@@ -18,9 +20,10 @@
     <style>
     
       paper-icon-item{
-        border:1px solid var(--lumo-primary-color);
+        border:2px solid var(--lumo-primary-color);
         border-radius: var(--lumo-border-radius);
         box-shadow: var(--lumo-box-shadow-s);
+        margin: 1rem;
        
       }
   
@@ -29,28 +32,30 @@
     <!-- shadow DOM for your element -->
 
     <paper-icon-item>
-    	<paper-item-body>
+    	<paper-item-body two-line>
     		<div>[[item]]</div>
+        <div secondary>
+          <div>melhor preço:</div>
+          <div>supermercado:</div>
+        </div>
     	</paper-item-body>
       <paper-menu-button vertical-align="bottom" horizontal-align="right" horizontal-offset="5" vertical-offset="-12">
         <paper-icon-button icon="my-icons:more-vert" slot="dropdown-trigger"></paper-icon-button>
           <paper-listbox slot="dropdown-content">
-            <paper-item>Painel</paper-item>
+            <paper-item on-click="setItemRoute">Painel</paper-item>
             <paper-item>Editar</paper-item>
-            <paper-item>Deletar</paper-item>
+            <paper-item on-click="deleteItem">Deletar</paper-item>
           </paper-listbox>
       </paper-menu-button>
       <iron-icon icon="my-icons:cancel" on-click="cancel"></iron-icon>
-    </paper-icon-item>
-
-   
+    </paper-icon-item> 
 
   </template>
 
   <script>
 
     // Define the element's API using an ES2015 class
-    class SelectedItem extends Polymer.Element {
+    class SelectedItem extends NavigateMixin(Polymer.Element) {
 
       static get is() { return 'selected-item'; }
 
@@ -64,6 +69,12 @@
       cancel(){
       	this.dispatchEvent(new CustomEvent('clear-selected',{bubbles:true, composed:true}))
       }
+
+      setItemRoute(){      
+        this.navigateTo(this.item); // navigate-mixin
+      }
+
+ 
     
 
     }

@@ -4,6 +4,7 @@
 <link rel="import" href="item-form.html">
 <link rel="import" href="product-form.html">
 <link rel="import" href="brand-form.html">
+<link rel="import" href="supermarket-form.html">
 <!-- FIREBASE SERVICE META -->
 <link rel="import" href="../bower_components/iron-meta/iron-meta.html">
     
@@ -16,7 +17,12 @@
 
     <iron-meta id="elmeta"></iron-meta>
 
-    <item-form on-save-item="saveItem" on-open-dialog="openDialog" on-open-dialog-brand="openDialogBrand"></item-form>
+    <item-form 
+      on-save-item="saveItem" 
+      on-open-dialog="openDialog" 
+      on-open-dialog-brand="openDialogBrand" 
+      on-open-dialog-supermarket="openDialogMarket">
+    </item-form>
 
     <vaadin-dialog id="dialogProduct">
       <template>
@@ -29,7 +35,12 @@
         <brand-form on-save-brand="addBrand"></brand-form>
       </template>
     </vaadin-dialog>
-   
+
+    <vaadin-dialog id="dialogMarket">
+      <template>
+        <supermarket-form on-save-supermarket="addSupermarket"></supermarket-form>
+      </template>
+    </vaadin-dialog>
 
   </template>
 
@@ -52,33 +63,41 @@
 
           item:Object,
           product:Object,    
-          brand:Object,     
-       
+          brand:Object, 
+          supermarket:Object,    
+          
         }
       }
 
       ready(){
         super.ready();
-
         /** firebase service Objects */
         this.fireService = this.$.elmeta.byKey('shareService');
         this.fbapp = this.fireService.fbapp;
+
       }
 
       /** save a new item in the Firebase Firestore */
       saveItem(e){
-        this.item = e.detail;
-        let db = this.fbapp.firestore();
-        let itemRef = db.collection(this.item.name).doc(); //item path to save the item id to use it later
-        this.item.Id = itemRef.id; // save the item id to use it later
-        itemRef.set(this.item) // save item in Firebase Firestore
+        
+          this.item = e.detail;
+          let db = this.fbapp.firestore();
+          let itemRef = db.collection(this.item.name).doc(); //item path to save the item id to use it later
+          this.item.Id = itemRef.id; // save the item id to use it later
+
+        //  let itemRefSupermarket = db.collection(this.item.name).doc(this.item.priceType).collection(this.item.supermarket);
+
+        let itemRefSupermarket = db.collection(this.item.supermarket);
+
+           itemRefSupermarket.add(this.item)  // itemRef.set(this.item) // save item in Firebase Firestore
             .then(()=>{
               this.launchPositiveToast('Item cadastrado')           
             })
             .catch(function(error){
               console.log(error);
               this.launchNegativeToast('Opps! Error')
-            });
+            });      
+        
       }
 
       openDialog(){
@@ -89,7 +108,7 @@
         this.product = e.detail;
         let db = this.fbapp.firestore();
         let refProd = db.collection('products');
-        refProd.add(this.product)
+        refProd.add(this.product) 
           .then(()=>{
               this.launchPositiveToast('Produto cadastrado')
               this.$.dialogProduct.opened = false;           
@@ -111,6 +130,24 @@
           .then(()=>{
               this.launchPositiveToast('Marca cadastrada')
               this.$.dialogBrand.opened = false;           
+          })
+          .catch(function(error){
+              this.launchNegativeToast('Opps! Error')
+          });
+      }
+
+      openDialogMarket(){
+        this.$.dialogMarket.opened = true;
+      }
+      /** save a new supermarket in the Firebase Firestore */
+      addSupermarket(e){
+        this.supermarket = e.detail;
+        let db = this.fbapp.firestore();
+        let refSupermarket = db.collection('supermarkets');
+        refSupermarket.add(this.supermarket)
+          .then(()=>{
+              this.launchPositiveToast('Supermercado cadastrado')
+              this.$.dialogMarket.opened = false;           
           })
           .catch(function(error){
               this.launchNegativeToast('Opps! Error')

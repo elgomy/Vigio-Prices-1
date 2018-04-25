@@ -1,0 +1,96 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<!-- MIXINS -->
+<link rel="import" href="../mixins/add-firecollection-array-filter.html">
+<link rel="import" href="../mixins/firebase-service-firestore.html">
+
+<link rel="import" href="item-w-actions.html">
+
+<!-- FIREBASE SERVICE META -->
+<link rel="import" href="../bower_components/iron-meta/iron-meta.html">
+    
+<dom-module id="item-supermarket">
+  <!-- Optional shadow DOM template -->
+  <template>
+    <style>
+      
+      paper-card{
+        width: 300px
+      }
+
+      paper-card{
+        --paper-card-header-image:{
+            
+        }
+      }
+      
+    </style>
+
+    <iron-meta id="elmeta"></iron-meta>
+
+    <template is="dom-if" if="[[products.length]]">
+      <paper-card image="https://www.enviarcurriculum.es/wp-content/uploads/2017/01/Empleo-Carrefour-Aguilas.jpg" alt="Carrefour">
+        <div class="card-content">
+          <template is="dom-repeat" items="[[products]]" as="product">
+            <item-w-actions 
+              name="[[product.name]]" 
+              brand="[[product.brand]]" 
+              price="[[product.price]]">
+            </item-w-actions>
+          </template>
+        </div>
+        <div class="card-actions">
+          <paper-button>Share</paper-button>
+          <paper-button>Explore!</paper-button>
+        </div>
+      </paper-card>
+    </template>
+
+  </template>
+
+  <script>
+    /**
+      * Element to show a list of the supermarket products 
+      * Receive 'item' parameter and 'supermarket' parameter to create a path to access a product documents of a supermarket collection in Firebase Firestore, through AddFirecollectionArrayFilter mixin, and store those products in an Array to iterate it with a dom-repeat template
+      **/
+    class ItemSupermarket extends AddFirecollectionArrayFilter(FirebaseServiceFirestore(Polymer.Element)){
+
+      static get is() { return 'item-supermarket'; }
+
+      // Declare properties for the element's public API         
+      static get properties() {
+        return {
+          item:{
+            type:String,
+            observer:'itemObserver'
+          },
+          products:{
+            type:Array,
+            value(){
+              return[]
+            }          
+          },
+          supermarket:String,        
+        }
+      }
+
+      ready(){
+        super.ready();
+        let db = this.initializeFireservice(); /** firebase-service-firestore Mixin */            
+        this.addList(this.supermarket ,'products', db, this.item); /** add-firecollection-array-filter Mixin */ 
+      }    
+      /**
+      * Observer that is launched when the selected item is changed (item received as parameter in the routing system of the 'my-view2' component)
+      **/
+      itemObserver(){
+        let db = this.initializeFireservice(); /** firebase-service-firestore Mixin */
+        this.addList(this.supermarket ,'products', db, this.item); /** add-firecollection-array-filter Mixin */
+      }
+
+    }
+
+    // Register the x-custom element with the browser
+    customElements.define(ItemSupermarket.is, ItemSupermarket);
+  </script>
+
+</dom-module>
