@@ -1,0 +1,84 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../elements/item-edit-form.html">
+<link rel="import" href="../bower_components/iron-meta/iron-meta.html">
+<link rel="import" href="../mixins/firebase-service-firestore.html">
+<link rel="import" href="../mixins/navigate-mixin.html">
+<link rel="import" href="../mixins/toast-mixin.html">
+
+<dom-module id="my-item-editor">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+
+    <iron-meta id="elmeta"></iron-meta>
+
+    <app-route
+        route="{{route}}"
+        pattern="/:supermarket/:Id/:name/:brand/:price/:priceType"
+        data="{{data}}">
+    </app-route>
+
+    <div class="card">
+     
+      <h1>item editor view</h1>
+
+      <item-edit-form item="[[data]]" on-edit-item="editItem"></item-edit-form>
+      
+    </div>
+  </template>
+
+  <script>
+    class MyItemEditor extends FirebaseServiceFirestore(NavigateMixin(ToastMixin(Polymer.Element))) {
+      static get is() { return 'my-item-editor'; }
+
+      static get properties(){
+      	return{
+      		Id:Number
+      	}
+      }
+
+      ready(){
+        super.ready();
+        let db = this.initializeFireservice();
+        let itemRef = db.collection(this.data.supermarket).doc(this.data.Id);
+        itemRef.get().then(function(doc){
+			if (doc.exists){
+				console.log(doc.data());
+				console.log(doc)
+				
+			} else {
+				console.log('no existe ese documento')
+			}
+		}).catch(function(error){
+			console.log('no se ha podido consultar el documento')
+		});
+        
+      }
+
+      editItem(e){
+        console.log(e.detail);
+        let db = this.initializeFireservice();
+        let itemRef = db.collection(e.detail.supermarket).doc(e.detail.Id);
+        itemRef.update({
+          brand: e.detail.brand,
+          price: e.detail.price,
+          priceType: e.detail.priceType
+        })
+        .then(()=>{
+        this.launchPositiveToast('Item atualizado')
+        this.navigateTo('/view2/' + e.detail.name); // navigate-mixin
+    })
+      }
+
+    }
+
+    window.customElements.define(MyItemEditor.is, MyItemEditor);
+  </script>
+</dom-module>

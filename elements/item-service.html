@@ -1,0 +1,81 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../mixins/firebase-service-firestore.html">
+<link rel="import" href="item-w-actions.html">
+<link rel="import" href="../mixins/toast-mixin.html">
+<link rel="import" href="../mixins/navigate-mixin.html">
+
+<!-- FIREBASE SERVICE META -->
+<link rel="import" href="../bower_components/iron-meta/iron-meta.html">
+    
+<dom-module id="item-service">
+  <!-- Optional shadow DOM template -->
+  <template>
+    <style>
+      /* CSS rules for your element */
+    </style>
+
+    <iron-meta id="elmeta"></iron-meta>
+
+    <item-w-actions 
+    	item="[[item]]" 
+    	on-delete-item="deleteItem"
+    	on-edit-item="editItem"> 		
+    </item-w-actions>
+
+    
+
+  </template>
+
+  <script>
+
+    // Define the element's API using an ES2015 class
+    class ItemService extends FirebaseServiceFirestore(ToastMixin(NavigateMixin(Polymer.Element))) {
+
+      static get is() { return 'item-service'; }
+
+      // Declare properties for the element's public API         
+      static get properties() {
+        return {
+          item:Object
+        }
+      }
+
+      ready(){
+        super.ready();
+       // let db = this.initializeFireservice();
+            
+      }
+
+      deleteItem(e){
+      	let db = this.initializeFireservice();
+      	db.collection(e.detail.supermarket).doc(e.detail.Id).delete().then(()=>{
+			       this.launchPositiveToast('Item deletado')
+		    }).catch((error)=>{
+			       this.launchNegativeToast('Opps! Error')
+		    });
+      }
+
+       editItem(e){
+        let item = e.detail;
+      	this.navigateTo(
+          '/item-editor/' + 
+          item.supermarket + 
+          '/' + 
+          item.Id +
+          '/' + 
+          item.name +
+          '/' + 
+          item.brand +
+          '/' + 
+          item.price +
+          '/' + 
+          item.priceType)
+      }
+
+    }
+
+    // Register the x-custom element with the browser
+    customElements.define(ItemService.is, ItemService);
+  </script>
+
+</dom-module>

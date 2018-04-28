@@ -87,9 +87,9 @@
 
         //  let itemRefSupermarket = db.collection(this.item.name).doc(this.item.priceType).collection(this.item.supermarket);
 
-        let itemRefSupermarket = db.collection(this.item.supermarket);
+        let itemRefSupermarket = db.collection(this.item.supermarket).doc(this.item.Id);
 
-           itemRefSupermarket.add(this.item)  // itemRef.set(this.item) // save item in Firebase Firestore
+           itemRefSupermarket.set(this.item)  // itemRef.set(this.item) // save item in Firebase Firestore
             .then(()=>{
               this.launchPositiveToast('Item cadastrado')           
             })

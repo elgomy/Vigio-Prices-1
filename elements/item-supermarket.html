@@ -4,7 +4,11 @@
 <link rel="import" href="../mixins/add-firecollection-array-filter.html">
 <link rel="import" href="../mixins/firebase-service-firestore.html">
 
-<link rel="import" href="item-w-actions.html">
+<link rel="import" href="item-service.html">
+
+<!-- VAADIN LUMO STYLES -->
+<link rel="import" href="../bower_components/vaadin-lumo-styles/typography.html">
+<link rel="import" href="../bower_components/vaadin-lumo-styles/color.html">
 
 <!-- FIREBASE SERVICE META -->
 <link rel="import" href="../bower_components/iron-meta/iron-meta.html">
@@ -12,35 +16,35 @@
 <dom-module id="item-supermarket">
   <!-- Optional shadow DOM template -->
   <template>
-    <style>
+    <style include="lumo-typography lumo-color">
       
       paper-card{
-        width: 300px
+        max-width: 70rem;
+        margin-bottom:1rem;
       }
 
       paper-card{
-        --paper-card-header-image:{
-            
-        }
+        --paper-card-header:{
+
+        };
       }
+
       
     </style>
 
     <iron-meta id="elmeta"></iron-meta>
 
     <template is="dom-if" if="[[products.length]]">
-      <paper-card image="https://www.enviarcurriculum.es/wp-content/uploads/2017/01/Empleo-Carrefour-Aguilas.jpg" alt="Carrefour">
+      <paper-card image="[[supermarketLogo]]">
         <div class="card-content">
           <template is="dom-repeat" items="[[products]]" as="product">
-            <item-w-actions 
-              name="[[product.name]]" 
-              brand="[[product.brand]]" 
-              price="[[product.price]]">
-            </item-w-actions>
+            <item-service 
+              item="[[product]]">
+            </item-service>
           </template>
         </div>
         <div class="card-actions">
-          <paper-button>Share</paper-button>
+          <paper-button>Deletar</paper-button>
           <paper-button>Explore!</paper-button>
         </div>
       </paper-card>
@@ -70,21 +74,22 @@
               return[]
             }          
           },
-          supermarket:String,        
+          supermarketName:String, 
+          supermarketLogo:String       
         }
       }
 
       ready(){
         super.ready();
         let db = this.initializeFireservice(); /** firebase-service-firestore Mixin */            
-        this.addList(this.supermarket ,'products', db, this.item); /** add-firecollection-array-filter Mixin */ 
+        this.addList(this.supermarketName ,'products', db, this.item); /** add-firecollection-array-filter Mixin */ 
       }    
       /**
       * Observer that is launched when the selected item is changed (item received as parameter in the routing system of the 'my-view2' component)
       **/
       itemObserver(){
         let db = this.initializeFireservice(); /** firebase-service-firestore Mixin */
-        this.addList(this.supermarket ,'products', db, this.item); /** add-firecollection-array-filter Mixin */
+        this.addList(this.supermarketName ,'products', db, this.item); /** add-firecollection-array-filter Mixin */
       }
 
     }

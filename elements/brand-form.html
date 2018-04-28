@@ -41,7 +41,7 @@
       static get properties() {
         return {
           brand: {
-            type: Object,        
+            type: String,        
           },
         }
       }
@@ -58,7 +58,7 @@
         }
         else {
           this.$.brand.invalid = true;
-        	this.$.brand.errorMessage = "digita o nome da marca";
+        	this.$.brand.errorMessage = "Digita o nome da marca";
         }
         
       }

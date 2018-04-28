@@ -116,13 +116,13 @@
         this.selectedProd = '';
         this.selectedVaadinList = '';
         this.$.comboProducts.value = '';
-        this.navigateTo('');
+        this.navigateTo('/view2/');
       }
       /** 
       * Create a route adding the selected product as parameter
       */
       setItemRoute(){      
-        this.navigateTo(this.selectedProd); // navigate-mixin
+        this.navigateTo('/view2/' + this.selectedProd); // navigate-mixin
       }
      
 

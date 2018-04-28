@@ -7,6 +7,9 @@
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/neon-animation/web-animations.html">
+<!-- VAADIN LUMO STYLES -->
+<link rel="import" href="../bower_components/vaadin-lumo-styles/typography.html">
+<link rel="import" href="../bower_components/vaadin-lumo-styles/color.html">
 
 
 <link rel="import" href="../src/my-icons.html">
@@ -14,37 +17,57 @@
 <dom-module id="item-w-actions">
 
   <template>
-    <style>
-     
+    <style include="lumo-typography lumo-color">
+      .paper-item-title{
+        font-weight: bold
+      }
+
+      paper-item{
+        --paper-item:{
+          border-top: 1px solid var(--lumo-shade-20pct);
+        };
+        --paper-item-focused:{
+          background: var(--lumo-primary-color-50pct);
+          color:white;
+          --paper-item-body-secondary-color:white;
+        }
+      }
+
+      paper-item:hover{
+        --paper-item:{
+          background:var(--lumo-primary-color-10pct);
+        };
+      }
   
     </style>
 
 
-    <paper-icon-item>
+    <paper-item>
     	<paper-item-body two-line>
-    		<div>[[name]]</div>
+    		<div class="paper-item-title">[[item.name]]</div>
         <div secondary>
-          <div>preço: [[price]]</div>
-          <div>marca: [[brand]]</div>
+          <div>Preço: [[item.price]]</div>
+          <div>Data:  [[item.formattedDate]]</div>
+          <div>Marca: [[item.brand]]</div>
         </div>
     	</paper-item-body>
       <paper-menu-button 
         vertical-align="bottom" 
         horizontal-align="right" 
-        horizontal-offset="5" 
-        vertical-offset="-12">
+        horizontal-offset="-5" 
+        vertical-offset="-2">
           <paper-icon-button 
             icon="my-icons:more-vert" 
             slot="dropdown-trigger">
           </paper-icon-button>
             <paper-listbox slot="dropdown-content">
               <paper-item on-click="setItemRoute">Painel</paper-item>
-              <paper-item>Editar</paper-item>
+              <paper-item on-click="editItem">Editar</paper-item>
               <paper-item on-click="deleteItem">Deletar</paper-item>
             </paper-listbox>
       </paper-menu-button>
-      <iron-icon icon="my-icons:cancel" on-click="cancel"></iron-icon>
-    </paper-icon-item>  
+     
+    </paper-item>  
 
   </template>
 
@@ -59,15 +82,18 @@
         
       static get properties() {
         return {
-          name:String,
-          brand:String,
-          price:Number,
+          item:Object
+
         }
       }
 
-      cancel(){
-      	this.dispatchEvent(new CustomEvent('clear-selected',{bubbles:true, composed:true}))
-      }  
+      deleteItem(){
+      	this.dispatchEvent(new CustomEvent('delete-item',{bubbles:true, composed:true, detail:this.item}))
+      } 
+
+      editItem(){
+        this.dispatchEvent(new CustomEvent('edit-item',{bubbles:true, composed:true, detail:this.item}))
+      } 
 
     }
 

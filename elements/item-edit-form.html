@@ -1,0 +1,174 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<!-- VAADIN COMBO BOX -->
+<link rel="import" href="../bower_components/vaadin-valo-theme/vaadin-combo-box.html">
+<link rel="import" href="../bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<!-- VAADIN TEXT FIELD -->
+<link rel="import" href="../bower_components/vaadin-text-field/vaadin-text-field.html">
+
+<!-- VAADIN LUMO STYLES -->
+<link rel="import" href="../bower_components/vaadin-lumo-styles/typography.html">
+<link rel="import" href="../bower_components/vaadin-lumo-styles/color.html">
+<!-- FIREBASE SERVICE META -->
+<link rel="import" href="../bower_components/iron-meta/iron-meta.html">
+
+<!-- MIXINS -->
+<link rel="import" href="../mixins/add-firecollection-combobox.html">
+<link rel="import" href="../mixins/toast-mixin.html">
+<link rel="import" href="../mixins/clear-form-inputs.html">
+<link rel="import" href="../mixins/firebase-service-firestore.html">
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../src/my-icons.html">
+
+    
+<dom-module id="item-edit-form">
+  <!-- Optional shadow DOM template -->
+  <template>
+    <style include="lumo-typography lumo-color">
+      
+    	vaadin-combo-box, vaadin-text-field{
+      		width: 15rem;  
+     	}
+
+      iron-icon{
+          --iron-icon-width:18px;     
+          --iron-icon-height:18px; 
+      }
+
+      .text-container, .radio-button{
+          font-family: var(--lumo-font-family);
+          font-size: var(--lumo-font-size-xs);
+      }
+
+      paper-radio-button{
+        --paper-radio-button-label-color: var(--lumo-secondary-text-color);
+        --paper-radio-button-checked-color: var(--lumo-primary-color);
+        --paper-radio-button-unchecked-color: var(--lumo-primary-color);
+      }
+
+    </style>
+
+    <iron-meta id="elmeta"></iron-meta>
+
+   [[item.name]] [[item.supermarket]]
+
+	<!-- COMBOS -->
+    <div class="combo-container">
+    	<vaadin-combo-box 
+    		id="comboBrands" 
+    		label="Marca" 
+    		placeholder="Seleciona" 
+    		items="[[brands]]" 
+        selected-item="[[item.brand]]"
+        	required>
+       	</vaadin-combo-box>
+    </div>
+
+	<!-- INPUT FIELD -->
+    <div class="text-field-container">
+    	<vaadin-text-field 
+    		label="Preço" 
+    		id="priceField" 
+    		required 
+    		pattern="^(([0-9]+(?:\.[0-9]+)?)|([0-9]*(?:\.[0-9]+)?))$" 
+    		error-message="incluir um número válido (.)" 
+        value="[[item.price]]"
+    		placeholder="Digita">
+    	</vaadin-text-field>
+    </div>
+
+    <paper-radio-group id="radioGroup" selected="[[item.priceType]]">
+      <paper-radio-button name="normal" value="normal" class="radio-button">Sem Oferta</paper-radio-button>
+      <paper-radio-button name="discount" value="discount" class="radio-button">Oferta</paper-radio-button>
+    </paper-radio-group>
+
+    <div>
+      <paper-button raised on-click="editItem">Atualizar</paper-button>
+    </div>
+
+  </template>
+
+  <script>
+
+    // Define the element's API using an ES2015 class
+    class ItemEditForm extends AddFirecollectionCombobox(ToastMixin(ClearFormInputs(FirebaseServiceFirestore(Polymer.Element)))) {
+
+      static get is() { return 'item-edit-form'; }
+
+      // Declare properties for the element's public API         
+      static get properties() {
+        return {
+          supermarket:String,
+
+          /** Products Array where store product brands receceived by Firebase Firestore (add-firecollection-combobox Mixin)  .*/
+          brands:{
+            type:Array,
+            value(){
+              return[]
+            }
+          },
+
+          item:{
+            type:Object,
+            value(){
+              return{
+                name:'',
+                brand:'',
+                price:'',
+                supermarket:'',
+                priceType:'',
+                Id:''
+              }
+            }
+          },
+        }
+      }
+
+      ready(){
+      	super.ready();
+      	let db = this.initializeFireservice();
+
+		    /** add-firecollection-combobox Mixin */
+      	this.addList('brands','brands',db); 
+       
+      }
+
+
+      /** verify if all the form inputs have value, then launch the item object to be listened by other element */
+      editItem(){
+          if(this.$.priceField.invalid)
+              return false;
+
+          this.item = {
+              name: this.item.name,
+              brand: this.$.comboBrands.value,
+              price: parseFloat(this.$.priceField.value),
+              supermarket: this.item.supermarket,
+              priceType: this.$.radioGroup.selected,
+              Id: this.item.Id
+          };
+
+          if(this.$.comboBrands.value && this.$.priceField.value){
+              this.dispatchEvent(new CustomEvent('edit-item', {bubbles:true, composed:true, detail:this.item}));
+              this.clearForm();
+          }
+          else this.launchNegativeToast('Preenche todos os campos');        
+      }
+
+      clearForm(){        
+          this.clearInputs('vaadin-combo-box');
+          this.clearInputs('vaadin-text-field');
+  
+      }
+
+
+    }
+
+    // Register the x-custom element with the browser
+    customElements.define(ItemEditForm.is, ItemEditForm);
+  </script>
+
+</dom-module>
